@@ -1,5 +1,5 @@
 //GLOBAL Variables
-let topics = [];
+let topics = ['Tupac', 'Biggie Smalls','Snoop Dog','Lil Wayne','Drake','J.Cole','50 Cent'];
 const queryBaseURL = "https://api.giphy.com/v1/gifs/search?";
 const apiKey = "api_key=r3tgS87AKU51FhXnottIw31nW29GMrUv";
 const query = "&q=";
@@ -8,12 +8,16 @@ let queryURL = queryBaseURL+apiKey+query;
 let urlArray = [];
 
 //API Response Constructor
-function Giph(stillImage,animatedImage, isPlaying){
+function Giph(stillImage,animatedImage,imageRating, isPlaying){
     this.imagePlaying = animatedImage;
     this.imageStopped = stillImage;
+    this.imageRating = imageRating;
     this.isPlaying = isPlaying;
   }
 
+  $(document).ready(function(){
+    addTopicsFromArrayToUIContainer($("#category-container"));
+  });
 //CLICK EVENTS
 $("#submit-button").on('click',function(e){
 
@@ -82,14 +86,25 @@ function parseResponse(response){
     urlArray.length = 0;
     console.log(response);
     for(var i = 0;i< response.data.length;i++){
-        let urlObject = new Giph(response.data[i].images.fixed_height_still.url,response.data[i].images.fixed_height.url,false);
+        let urlObject = new Giph(response.data[i].images.fixed_height_still.url,response.data[i].images.fixed_height.url,response.data[i].rating,false);
         urlArray.push(urlObject);
         var image = $("<img>");
         image.attr("alt","Image "+ i);
         image.attr("id",i);
         image.attr("src",urlObject.imageStopped);
         image.addClass("giph");
-        $("#giphy-container").append(image);
+        
+        var ratingTitle = $("<p></p>");
+        ratingTitle.text("Rating: "+urlObject.imageRating);
+        ratingTitle.addClass("rating");
+        
+        var giphDiv = $("<div></div>");
+        giphDiv.addClass("giph-container");
+       
+        $("#giphy-container").append(giphDiv);
+        giphDiv.append(image);
+        giphDiv.append(ratingTitle);
+
     }
 }
 function addTopicsFromArrayToUIContainer($uiContainer){
@@ -99,6 +114,8 @@ function addTopicsFromArrayToUIContainer($uiContainer){
         let $newButton = $('<button class="btn btn-primary mx-auto"></button>');
         $newButton.attr('id',topics[i]);
         $newButton.addClass("category-button");
+        // $newButton.addClass("mx-auto");
+        // $newButton.addClass("my-auto");
         $newButton.text(topics[i]);
         $uiContainer.append($newButton);
     }
